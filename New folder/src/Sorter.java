@@ -181,7 +181,7 @@ public class Sorter {
 				s = s.substring(stopsp + 1, s.length());
 			}
 		}
-		return compareArgs(compare, 2);
+		return compareArgs(compare, 1);
 	}
 	
 	public static String compareArgs(int compare, int methodselect){
@@ -208,13 +208,18 @@ public class Sorter {
 						return s.substring(colonspot + 1);
 					}
 				}
-				//No "ARG1" found, use method 1
-				String rts = arglist.get(0);
-				if (!(rts.contains("ARG1") || rts.contains("ARG2"))){
-					int colonspot = rts.indexOf(":");
-					return arglist.get(0).substring(colonspot + 1);
-				}
 				
+				//No "ARG1" found, use modified method 1
+				ArrayList<String> targs = new ArrayList<String>();
+				for (int i = targs.size(); i > 0; i--){
+					if (targs.get(i).contains("ARG2")){ //Prevents ARG2 from being selected
+						targs.remove(i);
+					}
+				}
+				Collections.sort(arglist);
+				String rts = targs.get(0);
+				int colonspot = rts.indexOf(":");
+				return rts.substring(colonspot + 1);
 			}
 			if(compare == 1){
 				for (String s: arglist){
@@ -225,11 +230,17 @@ public class Sorter {
 					}
 				}
 				//No "ARG2" found, use method 1
-				String rts = arglist.get(arglist.size()-1);
-				if (!(rts.contains("ARG1") || rts.contains("ARG2"))){
-					int colonspot = rts.indexOf(":");
-					return arglist.get(arglist.size()-1).substring(colonspot + 1);
+				
+				ArrayList<String> targs = new ArrayList<String>();
+				for (int i = targs.size(); i > 0; i--){
+					if (targs.get(i).contains("ARG1")){ // Prevents ARG1 from being selected
+						targs.remove(i);
+					}
 				}
+				Collections.sort(arglist);
+				String rts = targs.get(arglist.size()-1);
+				int colonspot = rts.indexOf(":");
+				return rts.substring(colonspot + 1);
 			}
 		}
 		
