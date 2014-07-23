@@ -166,7 +166,6 @@ public class test_Sort{
 		 * To Exit, make the line contain ||
 		 */
 		System.out.println("-<Initialized>-");
-		System.out.println("Verbose?");
 		
 		/*
 		System.out.println("Specify Path to File: "); //If file reading option is required
@@ -202,7 +201,6 @@ public class test_Sort{
 			
 			sc.nextLine(); //Skips over Space
 		}
-		
 		System.out.println("\n-<Exiting>-");
 	}
 }
