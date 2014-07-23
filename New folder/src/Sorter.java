@@ -126,52 +126,73 @@ public class Sorter {
 	
 	public static void TripleGen(){
 		for(String s: evs){
-			String a = ArgID(s, -1);
-			String c = ArgID(s, 1);
-			String b = getEvContent(s);
-			/*System.out.print(ArgID(s, -1) + " "); //First Arg Reference
-			System.out.print(s + " ");//Eventuality Reference
-			System.out.println(ArgID(s, 1)); //Last Arg Reference*/
+			String a = null;
+			String b = null;
+			String c = null;
+			a = ArgID(s, -1);
+			b = getEvContent(s);
+			c = ArgID(s, 1);
+			if (!(a == null || b == null || c == null)){//If a triple is present
+				System.out.println("TRIPLE: " + a + "(a) " + b + "(b) " + c + "(c)");//Spit out the triple
+			}
 		}
 	}
 	public static String getEvContent(String s){
-		int left = s.indexOf(":");
+		int left = s.indexOf(":") + 1;
 		int right = s.indexOf("<", left + 1);
-		return s.substring(left, right + 1);
+		return s.substring(left, right);
 	}
 	public static String ArgID(String s, int compare){
 		//For this particular eventuality, parse for the args to the comma.
 		arglist.clear();
+		int lbracket = s.indexOf("[");
+		int rbracket = s.indexOf("]");
+		s = s.substring(lbracket + 1, rbracket + 1); //Inclusive of rear bracket
 		while (s.contains(",") || s.contains("]")){ //While there are still colons left
-			System.out.println("S is now " + s);
-			int startsp = s.indexOf("ARG"); //Look for first space
-			int stopsp = startsp; //Default to nothing
+			//System.out.println("S is now " + s);
+			int startsp = 0;
+			int stopsp = 0;
+			if (s.contains("ARG ")){
+				startsp = s.indexOf("ARG ") + 4; //Look for character that indicates type
+				stopsp = startsp; //Default to nothing
+			}
+			
 			
 			if (s.contains(",")){ //Look for stop character
 				stopsp = s.indexOf(",", startsp + 1); 
-				if (s.substring(startsp + 1, startsp+2).contains("e")){
+				if (s.substring(startsp, startsp+1).contains("e")){
+					System.out.println("E DETECTED AS ARGUMENT");
 					//REFER E to Processing
 				}
 				arglist.add(s.substring(startsp, stopsp));
+				//System.out.println("From , : " + s.substring(startsp, stopsp));
+				s = s.substring(stopsp + 2, s.length()); //Removes space after comma
 			}
 			
 			if (s.contains("]")){ //Look for stop character
 				stopsp = s.indexOf("]", startsp + 1); 
-				if (s.substring(startsp + 1, startsp+2).contains("e")){
+				if (s.substring(startsp, startsp + 1).contains("e")){
+					System.out.println("E DETECTED AS ARGUMENT");
 					//REFER E to Processing
 				}
+				//System.out.println(startsp + " | " + stopsp);
 				arglist.add(s.substring(startsp, stopsp));
+				//System.out.println("From ] : " + s.substring(startsp, stopsp));
+				s = s.substring(stopsp + 1, s.length());
 			}
-			s = s.substring(stopsp + 1, s.length()); //Removes space after comma
 			
 		}
 		
-		Collections.sort(arglist);
+		Collections.sort(arglist); // Sorts the Argument List
 		if(compare == -1){//Specify return lowest numbered ARG
-			return arglist.get(0);
+			String rts = arglist.get(0);
+			int colonspot = rts.indexOf(":");
+			return arglist.get(0).substring(colonspot + 1);
 		}
 		if(compare == 1){//Specify return highest numbered ARG
-			return arglist.get(arglist.size()-1);
+			String rts = arglist.get(arglist.size()-1);
+			int colonspot = rts.indexOf(":");
+			return arglist.get(arglist.size()-1).substring(colonspot + 1);
 		}
 		return null;//Otherwise, return nothing
 	}

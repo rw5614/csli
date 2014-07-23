@@ -39,8 +39,8 @@ public class testSorter {
 				Sorter.TripleGen();
 				System.out.println("\nEventualities:");
 				printArrList(Sorter.getEvs()); //Prints Evs
-				System.out.println("\n ArgList");
-				printArrList(Sorter.getArglist());
+				//System.out.println("\n ArgList");
+				//printArrList(Sorter.getArglist());
 				//System.out.println("\nFree Instances:");
 				//printArrList(Sorter.getInsts()); //Prints Insts
 				//System.out.println("\nEventuality-Instances");
