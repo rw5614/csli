@@ -180,21 +180,60 @@ public class Sorter {
 				//System.out.println("From ] : " + s.substring(startsp, stopsp));
 				s = s.substring(stopsp + 1, s.length());
 			}
-			
+		}
+		return compareArgs(compare, 2);
+	}
+	
+	public static String compareArgs(int compare, int methodselect){
+		if (methodselect == 1){//Simply Prioritizes using highest vs lowest
+			Collections.sort(arglist); // Sorts the Argument List
+			if(compare == -1){//Specify return lowest numbered ARG
+				String rts = arglist.get(0);
+				int colonspot = rts.indexOf(":");
+				return arglist.get(0).substring(colonspot + 1);
+			}
+			if(compare == 1){//Specify return highest numbered ARG
+				String rts = arglist.get(arglist.size()-1);
+				int colonspot = rts.indexOf(":");
+				return arglist.get(arglist.size()-1).substring(colonspot + 1);
+			}
+		}
+		if (methodselect == 2){ //Prioritizes variables named ARG1 or ARG2
+			Collections.sort(arglist);
+			if(compare == -1){
+				for (String s: arglist){
+					if (s.contains("ARG1")){
+						String rts = s;
+						int colonspot = rts.indexOf(":");
+						return s.substring(colonspot + 1);
+					}
+				}
+				//No "ARG1" found, use method 1
+				String rts = arglist.get(0);
+				if (!(rts.contains("ARG1") || rts.contains("ARG2"))){
+					int colonspot = rts.indexOf(":");
+					return arglist.get(0).substring(colonspot + 1);
+				}
+				
+			}
+			if(compare == 1){
+				for (String s: arglist){
+					if (s.contains("ARG2")){
+						String rts = s;
+						int colonspot = rts.indexOf(":");
+						return rts.substring(colonspot + 1);
+					}
+				}
+				//No "ARG2" found, use method 1
+				String rts = arglist.get(arglist.size()-1);
+				if (!(rts.contains("ARG1") || rts.contains("ARG2"))){
+					int colonspot = rts.indexOf(":");
+					return arglist.get(arglist.size()-1).substring(colonspot + 1);
+				}
+			}
 		}
 		
-		Collections.sort(arglist); // Sorts the Argument List
-		if(compare == -1){//Specify return lowest numbered ARG
-			String rts = arglist.get(0);
-			int colonspot = rts.indexOf(":");
-			return arglist.get(0).substring(colonspot + 1);
-		}
-		if(compare == 1){//Specify return highest numbered ARG
-			String rts = arglist.get(arglist.size()-1);
-			int colonspot = rts.indexOf(":");
-			return arglist.get(arglist.size()-1).substring(colonspot + 1);
-		}
-		return null;//Otherwise, return nothing
+		return null; //Otherwise, return nothing
 	}
 	
 	public static String oldArgID(String s, int compare){
@@ -277,12 +316,12 @@ public class Sorter {
 		}*/
 	}
 	
-	public static int containsEv(String s){
+	/*public static int containsEv(String s){
 		if (s.contains("ARG")){
 			int typeindicator = s.indexOf("ARG");
 		}
 		return 0;//TMP
-	}
+	}*/
 
 	public static void computeOldTriple(){
 		//NOT SURE IF THIS REACHES CORRECTLY
