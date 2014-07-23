@@ -4,13 +4,22 @@ import java.util.*;
 public class Sorter {
 	private static String input = "";
 	private static String keyEv = ""; //Key Eventuality
+	private static String evstring = "";
+	
 	private static ArrayList<String> evs = new ArrayList<String>();
 	private static ArrayList<String> insts = new ArrayList<String>();
 	private static ArrayList<String> evinsts = new ArrayList<String>();
 	private static ArrayList<String> ivars = new ArrayList<String>();
 	private static ArrayList<String> conjs = new ArrayList<String>();
 	private static ArrayList<String> arglist = new ArrayList<String>();
-	private static String evstring = "";
+	
+	public static String getInput(){
+		return input;
+	}
+	public static String getKeyEv(){
+		return keyEv;
+	}
+	
 	public static ArrayList<String> getEvs(){
 		return evs;
 	}
@@ -49,12 +58,16 @@ public class Sorter {
 		}
 	}
 	
-	public static void clearPast(){
+	public static void clear(){
 		keyEv = "";
 		input = "";
-		insts.clear();
+		evstring = "";
 		evs.clear();
+		insts.clear();
+		evinsts.clear();
 		ivars.clear();
+		conjs.clear();
+		arglist.clear();	
 	}	
 	
 	public static void buildIndex(String s){// Formats the input to "Pretty Printed" format
@@ -71,8 +84,10 @@ public class Sorter {
 						insts.add(s.substring(0, i+1));
 					}
 					else if (s.substring(0,1).equals("e")){ //Places Eventualities in evs Array
-						evs.add(s.substring(0, i+1));
-						evstring = evstring + (s.substring(0, i+1));
+						String addthis = s.substring(0, i+1);
+						addthis = addthis.replaceAll("CARG ", "ARGC xcc");
+						evs.add(addthis);
+						evstring = evstring + (addthis);
 					}
 					else if (s.substring(0,1).equals("i")){ //Places I-Variables in ivars Array
 						ivars.add(s.substring(0, i+1));
@@ -124,7 +139,8 @@ public class Sorter {
 		evinsts.addAll(hs);	
 	}
 	
-	public static void TripleGen(){
+	public static ArrayList<String> TripleGen(){
+		ArrayList<String> results = new ArrayList<String>();
 		for(String s: evs){
 			String a = null;
 			String b = null;
@@ -132,7 +148,7 @@ public class Sorter {
 			a = ArgID(s, -1);
 			b = getEvContent(s);
 			c = ArgID(s, 1);
-			//Check if any is unfilled, if so, call compareArgs(s, -2);
+			//Check if any slots are still unfilled, if so, fill again using traditional method (Method 1)
 			if (a == null){
 				System.out.println("A is null, filling.");
 				a = fillArgs(s, -1);
@@ -143,10 +159,26 @@ public class Sorter {
 				c = fillArgs(s, 1);
 				System.out.println("After Fill c: " + c);
 			}
-			if (!(a == null || b == null || c == null)){//If a triple is present
-				System.out.println("TRIPLE: " + a + "(a) " + b + "(b) " + c + "(c)");//Spit out the triple
+			
+			//Converts Case for Readability
+			if (a != null){
+				a = a.toLowerCase();
+			}
+			if (b!= null){
+				b = b.toUpperCase();
+			}
+			if (c != null){
+				c = c.toLowerCase();
+			}
+			System.out.println (a + " " + b + " " + c);
+			System.out.println((a == null) + " " + (b == null) + " " + (c == null) + "|" + a.equals(c));
+			//Adds the result to a list, if it is indeed a valid triple
+			if (a != null && b != null && c != null && !(a.equals(c))){//If a triple is present
+				results.add(a + " " + b + " " + c);
+				//System.out.println("TRIPLE: " + a + "(a) " + b + "(b) " + c + "(c)");//Spit out the triple DEBUG
 			}
 		}
+		return results;
 	}
 	
 	public static String fillArgs(String s, int compare){
