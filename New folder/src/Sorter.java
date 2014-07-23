@@ -9,6 +9,7 @@ public class Sorter {
 	private static ArrayList<String> evinsts = new ArrayList<String>();
 	private static ArrayList<String> ivars = new ArrayList<String>();
 	private static ArrayList<String> conjs = new ArrayList<String>();
+	private static ArrayList<String> arglist = new ArrayList<String>();
 	private static String evstring = "";
 	public static ArrayList<String> getEvs(){
 		return evs;
@@ -24,6 +25,9 @@ public class Sorter {
 	}
 	public static ArrayList<String> getEvinsts(){
 		return evinsts;
+	}
+	public static ArrayList<String> getArglist(){
+		return arglist;
 	}
 	public static void input(String s){
 		input = s;
@@ -91,14 +95,22 @@ public class Sorter {
 				int stopsp = startsp; //Default to nothing
 				if (s.contains(",")){ //Look for stop character
 					stopsp = s.indexOf(",", startsp + 1); 
-					
-					evinsts.add(s.substring(startsp + 1, stopsp));
+					if (s.contains("x")){
+						evinsts.add(s.substring(startsp + 1, stopsp));
+					}
+					else if (s.contains("e")){
+						System.out.println("EFLAG");
+					}
 					s = s.substring(stopsp + 2, s.length()); //Removes space after comma
 				}
 				else{
 					stopsp = s.indexOf("]", startsp + 1);
-					
-					evinsts.add(s.substring(startsp + 1, stopsp));
+					if (s.substring(startsp + 1, startsp+2).contains("x")){
+						evinsts.add(s.substring(startsp + 1, stopsp));
+					}
+					else if (s.substring(startsp + 1, startsp+2).contains("e")){
+						//FLAG THE E
+					}
 					s = s.substring(stopsp + 1, s.length());
 				}
 			}
@@ -109,8 +121,85 @@ public class Sorter {
 		HashSet<String> hs = new HashSet<String>();
 		hs.addAll(evinsts);
 		evinsts.clear();
-		evinsts.addAll(hs);
+		evinsts.addAll(hs);	
+	}
+	
+	public static void TripleGen(){
+		for(String s: evs){
+			String a = ArgID(s, -1);
+			String c = ArgID(s, 1);
+			String b = getEvContent(s);
+			/*System.out.print(ArgID(s, -1) + " "); //First Arg Reference
+			System.out.print(s + " ");//Eventuality Reference
+			System.out.println(ArgID(s, 1)); //Last Arg Reference*/
+		}
+	}
+	public static String getEvContent(String s){
+		int left = s.indexOf(":");
+		int right = s.indexOf("<", left + 1);
+		return s.substring(left, right + 1);
+	}
+	public static String ArgID(String s, int compare){
+		//For this particular eventuality, parse for the args to the comma.
+		arglist.clear();
+		while (s.contains(",") || s.contains("]")){ //While there are still colons left
+			System.out.println("S is now " + s);
+			int startsp = s.indexOf("ARG"); //Look for first space
+			int stopsp = startsp; //Default to nothing
+			
+			if (s.contains(",")){ //Look for stop character
+				stopsp = s.indexOf(",", startsp + 1); 
+				if (s.substring(startsp + 1, startsp+2).contains("e")){
+					//REFER E to Processing
+				}
+				arglist.add(s.substring(startsp, stopsp));
+			}
+			
+			if (s.contains("]")){ //Look for stop character
+				stopsp = s.indexOf("]", startsp + 1); 
+				if (s.substring(startsp + 1, startsp+2).contains("e")){
+					//REFER E to Processing
+				}
+				arglist.add(s.substring(startsp, stopsp));
+			}
+			s = s.substring(stopsp + 1, s.length()); //Removes space after comma
+			
+		}
 		
+		Collections.sort(arglist);
+		if(compare == -1){//Specify return lowest numbered ARG
+			return arglist.get(0);
+		}
+		if(compare == 1){//Specify return highest numbered ARG
+			return arglist.get(arglist.size()-1);
+		}
+		return null;//Otherwise, return nothing
+	}
+	
+	public static String oldArgID(String s, int compare){
+		//For this particular eventuality, parse for the args to the comma.
+		arglist.clear();
+		while (s.contains(":")){ //While there are still colons left
+			int startsp = s.indexOf("ARG"); //Look for first space
+			int stopsp = startsp; //Default to nothing
+			if (s.contains(":")){ //Look for stop character
+				stopsp = s.indexOf(":", startsp + 1); 
+				if (s.substring(startsp + 1, startsp+2).contains("e")){
+					//REFER E to Processing
+				}
+				arglist.add(s.substring(startsp, stopsp));
+				s = s.substring(stopsp + 1, s.length()); //Removes space after comma
+			}
+		}
+		
+		Collections.sort(arglist);
+		if(compare == -1){//Specify return lowest numbered ARG
+			return arglist.get(0);
+		}
+		if(compare == 1){//Specify return highest numbered ARG
+			return arglist.get(arglist.size()-1);
+		}
+		return null;//Otherwise, return nothing
 	}
 	
 	//Preprocesses Input, either as string of ArrayList
@@ -160,9 +249,20 @@ public class Sorter {
 	}
 	
 	public static void computeTriple(){
-		
+		/*String s = evs.get(index);
+		//Find the numbering of arggs
+		while (s.contains("ARG")){
+			int number = s.substring("ARG") + 3;
+		}*/
 	}
 	
+	public static int containsEv(String s){
+		if (s.contains("ARG")){
+			int typeindicator = s.indexOf("ARG");
+		}
+		return 0;//TMP
+	}
+
 	public static void computeOldTriple(){
 		//NOT SURE IF THIS REACHES CORRECTLY
 		int kloc = -1; //Find eventuality that matches the key

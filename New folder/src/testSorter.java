@@ -36,16 +36,19 @@ public class testSorter {
 				Sorter.sortConj();
 				Sorter.populateEvInsts();
 				Sorter.removeDuplicateEvInst();
+				Sorter.TripleGen();
 				System.out.println("\nEventualities:");
 				printArrList(Sorter.getEvs()); //Prints Evs
+				System.out.println("\n ArgList");
+				printArrList(Sorter.getArglist());
 				//System.out.println("\nFree Instances:");
 				//printArrList(Sorter.getInsts()); //Prints Insts
-				System.out.println("\nEventuality-Instances");
-				printArrList(Sorter.getEvinsts()); //Prints Conjs
-				System.out.println("\nIVars:");
-				printArrList(Sorter.getIvars()); //Prints Conjs
-				System.out.println("\nConjunctions:");
-				printArrList(Sorter.getConjs()); //Prints Conjs
+				//System.out.println("\nEventuality-Instances");
+				//printArrList(Sorter.getEvinsts()); //Prints Conjs
+				//System.out.println("\nIVars:");
+				//printArrList(Sorter.getIvars()); //Prints Conjs
+				//System.out.println("\nConjunctions:");
+				//printArrList(Sorter.getConjs()); //Prints Conjs
 				//Sorter.computeTriple(); Revise Computation of Triple
 				Sorter.clearPast();
 			}
