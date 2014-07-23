@@ -132,10 +132,50 @@ public class Sorter {
 			a = ArgID(s, -1);
 			b = getEvContent(s);
 			c = ArgID(s, 1);
+			//Check if any is unfilled, if so, call compareArgs(s, -2);
+			if (a == null){
+				System.out.println("A is null, filling.");
+				a = fillArgs(s, -1);
+				System.out.println("After Fill a: " + a);
+			}
+			if (c == null){
+				System.out.println("C is null, filling.");
+				c = fillArgs(s, 1);
+				System.out.println("After Fill c: " + c);
+			}
 			if (!(a == null || b == null || c == null)){//If a triple is present
 				System.out.println("TRIPLE: " + a + "(a) " + b + "(b) " + c + "(c)");//Spit out the triple
 			}
 		}
+	}
+	
+	public static String fillArgs(String s, int compare){
+		ArrayList<String> targs = new ArrayList<String>();
+		targs.clear();
+		targs.addAll(arglist);
+		if (compare == 1){
+			for (int i = targs.size() -1; i > 0; i--){
+				if (targs.get(i).contains("ARG2")){ //Prevents ARG2 from being selected
+					targs.remove(i);
+				}
+			}
+			Collections.sort(arglist);
+			String rts = targs.get(0);
+			int colonspot = rts.indexOf(":");
+			return rts.substring(colonspot + 1);
+		}
+		if (compare == -1){
+			for (int i = targs.size()-1; i > 0; i--){
+				if (targs.get(i).contains("ARG1")){ // Prevents ARG1 from being selected
+					targs.remove(i);
+				}
+			}
+			Collections.sort(arglist);
+			String rts = targs.get(arglist.size()-1);
+			int colonspot = rts.indexOf(":");
+			return rts.substring(colonspot + 1);
+		}
+		return null; //If unable to fill
 	}
 	public static String getEvContent(String s){
 		int left = s.indexOf(":") + 1;
@@ -181,7 +221,7 @@ public class Sorter {
 				s = s.substring(stopsp + 1, s.length());
 			}
 		}
-		return compareArgs(compare, 1);
+		return compareArgs(compare, 2);
 	}
 	
 	public static String compareArgs(int compare, int methodselect){
@@ -208,18 +248,6 @@ public class Sorter {
 						return s.substring(colonspot + 1);
 					}
 				}
-				
-				//No "ARG1" found, use modified method 1
-				ArrayList<String> targs = new ArrayList<String>();
-				for (int i = targs.size(); i > 0; i--){
-					if (targs.get(i).contains("ARG2")){ //Prevents ARG2 from being selected
-						targs.remove(i);
-					}
-				}
-				Collections.sort(arglist);
-				String rts = targs.get(0);
-				int colonspot = rts.indexOf(":");
-				return rts.substring(colonspot + 1);
 			}
 			if(compare == 1){
 				for (String s: arglist){
@@ -229,18 +257,6 @@ public class Sorter {
 						return rts.substring(colonspot + 1);
 					}
 				}
-				//No "ARG2" found, use method 1
-				
-				ArrayList<String> targs = new ArrayList<String>();
-				for (int i = targs.size(); i > 0; i--){
-					if (targs.get(i).contains("ARG1")){ // Prevents ARG1 from being selected
-						targs.remove(i);
-					}
-				}
-				Collections.sort(arglist);
-				String rts = targs.get(arglist.size()-1);
-				int colonspot = rts.indexOf(":");
-				return rts.substring(colonspot + 1);
 			}
 		}
 		
