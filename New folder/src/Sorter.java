@@ -1,4 +1,3 @@
-import java.util.ArrayList;
 import java.util.*;
 
 public class Sorter {
@@ -38,6 +37,7 @@ public class Sorter {
 	public static ArrayList<String> getArglist(){
 		return arglist;
 	}
+	
 	public static void input(String s){
 		input = s;
 	}
@@ -185,7 +185,7 @@ public class Sorter {
 		ArrayList<String> targs = new ArrayList<String>();
 		targs.clear();
 		targs.addAll(arglist);
-		if (compare == 1){
+		if (compare == -1){
 			for (int i = targs.size() -1; i > 0; i--){
 				if (targs.get(i).contains("ARG2")){ //Prevents ARG2 from being selected
 					targs.remove(i);
@@ -196,7 +196,7 @@ public class Sorter {
 			int colonspot = rts.indexOf(":");
 			return rts.substring(colonspot + 1);
 		}
-		if (compare == -1){
+		if (compare == 1){
 			for (int i = targs.size()-1; i > 0; i--){
 				if (targs.get(i).contains("ARG1")){ // Prevents ARG1 from being selected
 					targs.remove(i);
@@ -321,7 +321,7 @@ public class Sorter {
 		return null;//Otherwise, return nothing
 	}
 	
-	//Preprocesses Input, either as string of ArrayList
+	//Pre-processes Input, either as string of ArrayList
 	public static String touchInput(String s){//Removes Curly Brackets from Input
 		//System.out.println("Touched Input: " + s.substring(1, s.length()-1));
 		return s.substring(1, s.length()-1);
@@ -452,4 +452,11 @@ public class Sorter {
 		System.out.println(postparse);
 	}
 	
+	public static void printArrList(ArrayList<String> al){//Convenient ArrayList Printing for DEBUGGING
+		System.out.println("<Start of ArrayList>");
+		for (String s: al){
+			System.out.println(s);
+		}
+		System.out.println("<End of ArrayList>");
+	}
 }
