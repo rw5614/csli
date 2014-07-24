@@ -35,7 +35,7 @@ public class Sorter {
 				removeDuplicateEvInst(); //Remove Duplicate Eventuality-Instances
 				printDebugInfo(params);
 				System.out.println("Resulting Triples:");
-				return TripleGen();				
+				return TripleGen(2);				
 			}
 			else{
 				System.out.println("Input is not in ERG Format. -_- \n");
@@ -198,7 +198,7 @@ public class Sorter {
 		evinsts.addAll(hs);	
 	}
 	//Triple Generation
-	public static ArrayList<String> TripleGen(){
+	public static ArrayList<String> TripleGen(int mode){ //Mode one removes single-argument triples, mode 2 includes it with placeholder no_arg for empty arguments
 		ArrayList<String> results = new ArrayList<String>();
 		for(String s: evs){
 			String a = null;
@@ -208,18 +208,34 @@ public class Sorter {
 			b = getEvContent(s);
 			c = ArgID(s, 1);
 			//Check if any slots are still unfilled, if so, fill again using traditional method (Method 1)
-			if (a == null){
-				a = fillArgs(s, -1);
+			if ((a == null) && (c != null)){
+				if (mode == 1){
+					a = fillArgs(s, -1);
+				}
+				else if (mode == 2){
+					a = fillArgs(s, -1);
+					if (a.equals(c)){
+						a = "no_arg";
+					}
+				}
 				if (debugon){
 					System.out.println("A is null, filling.");
-					System.out.println("After Fill a: " + a);
+					System.out.println("After Fill a with mode " + mode + ": " + a);
 				}
 			}
-			if (c == null){
-				c = fillArgs(s, 1);
+			if ((c == null) && (a != null)){
+				if (mode == 1){
+					c = fillArgs(s, 1);
+				}
+				else if (mode == 2){
+					c = fillArgs(s, 1);
+					if (c.equals(a)){
+						c = "no_arg";
+					}
+				}
 				if (debugon){
 					System.out.println("C is null, filling.");
-					System.out.println("After Fill c: " + c);
+					System.out.println("After Fill c with mode " + mode + ": " + c);
 				}
 				
 			}
@@ -239,7 +255,7 @@ public class Sorter {
 				System.out.println((a == null) + " " + (b == null) + " " + (c == null) + "|" + a.equals(c));
 			}
 			//Adds the result to a list, if it is indeed a valid triple
-			if (a != null && b != null && c != null && !(a.equals(c))){//If a triple is present
+			if (a != null && b != null && c != null){//If a triple is present
 				results.add(a + " " + b + " " + c);
 				if (debugon){
 				System.out.println("TRIPLE: " + a + "(a) " + b + "(b) " + c + "(c)");//Spit out the triple DEBUG
