@@ -1,5 +1,4 @@
 import java.util.*;
-
 public class Sorter {
 	private static String input = "";
 	private static String keyEv = ""; //Key Eventuality
@@ -18,7 +17,6 @@ public class Sorter {
 		 * This program takes the ERG Output from STDIN and outputs relations discovered to STDOUT.
 		 * To Exit, make the next line contain the stop characters ||
 		 */
-		
 		while (!flowcontrol.contains("|Stop|")){
 			clear(); //Clears Variables to prepare for next sentence.
 			input(sentencein); //Build Sentence
@@ -167,8 +165,8 @@ public class Sorter {
 			while (s.contains(" ")){ //While there are still spaces left
 				int startsp = s.indexOf(" "); //Look for first space
 				int stopsp = startsp; //Default to nothing
-				if (s.contains(",")){ //Look for stop character
-					stopsp = s.indexOf(",", startsp + 1); 
+				if (s.contains(", ")){ //Look for stop character
+					stopsp = s.indexOf(", ", startsp + 1); 
 					if (s.contains("x")){
 						evinsts.add(s.substring(startsp + 1, stopsp));
 					}
@@ -289,7 +287,7 @@ public class Sorter {
 		int lbracket = s.indexOf("[");
 		int rbracket = s.indexOf("]");
 		s = s.substring(lbracket + 1, rbracket + 1); //Inclusive of rear bracket
-		while (s.contains(",") || s.contains("]")){ //While there are still colons left
+		while (s.contains(", ") || s.contains("]")){ //While there are still colons left
 			//System.out.println("S is now " + s);
 			int startsp = 0;
 			int stopsp = 0;
@@ -299,8 +297,8 @@ public class Sorter {
 			}
 			
 			
-			if (s.contains(",")){ //Look for stop character
-				stopsp = s.indexOf(",", startsp + 1); 
+			if (s.contains(", ")){ //Look for stop character
+				stopsp = s.indexOf(", ", startsp + 1); 
 				if (s.substring(startsp, startsp+1).contains("e")){
 					System.out.println("E DETECTED AS ARGUMENT");
 					//REFER E to Processing

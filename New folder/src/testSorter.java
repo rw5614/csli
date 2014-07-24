@@ -4,15 +4,19 @@ public class testSorter {
 	public static void main(String[] args){
 		System.out.println("-<Initialized>-");
 		String flowcontrol = "";
-		
-		do {
-			String sentence = sc.nextLine();
-			String ergplugin = sc.nextLine();
-			flowcontrol = sc.nextLine();
-			printArrList(Sorter.Parse(sentence, ergplugin, flowcontrol, ""));
-			System.out.println("");
-		} while ((!(flowcontrol.contains("|STOP|"))));
-		
+		try{//Add Error Handling for weird chunks
+			do {
+				String sentence = sc.nextLine();
+				String ergplugin = sc.nextLine();
+				flowcontrol = sc.nextLine();
+				printArrList(Sorter.Parse(sentence, ergplugin, flowcontrol, "-v"));
+				System.out.println("");
+			} while ((!(flowcontrol.contains("|STOP|"))));
+		}
+		catch(StringIndexOutOfBoundsException e){
+			System.out.println("ERR_CHUNK:" + Sorter.getInput()); //Identifies the chunk that's problematic
+			main(null);
+		}
 		System.out.println("\n-<Exiting>-");
 	}
 	
