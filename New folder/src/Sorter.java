@@ -4,7 +4,8 @@ public class Sorter {
 	private static String input = "";
 	private static String keyEv = ""; //Key Eventuality
 	private static String evstring = "";
-	
+	private static int sentencecounter = 0;
+	private static boolean debugon = false;
 	private static ArrayList<String> evs = new ArrayList<String>();
 	private static ArrayList<String> insts = new ArrayList<String>();
 	private static ArrayList<String> evinsts = new ArrayList<String>();
@@ -12,6 +13,72 @@ public class Sorter {
 	private static ArrayList<String> conjs = new ArrayList<String>();
 	private static ArrayList<String> arglist = new ArrayList<String>();
 	
+	public static ArrayList<String> Parse(String sentencein, String ergout, String flowcontrol, String params){
+		/*
+		 * This program takes the ERG Output from STDIN and outputs relations discovered to STDOUT.
+		 * To Exit, make the next line contain the stop characters ||
+		 */
+		
+		while (!flowcontrol.contains("|Stop|")){
+			clear(); //Clears Variables to prepare for next sentence.
+			input(sentencein); //Build Sentence
+			if(params.contains("-d")){
+				debugon = true;
+			}
+			if(InputFormatOK(ergout)){
+				System.out.println("#" + ++sentencecounter + ":");
+				if (params.contains("-v")){//Verbose Mode
+					System.out.println("Sentence: " + input);
+					System.out.println("ERG: " + ergout);
+				}
+				buildIndex(ergout); //Build Index from ERG Output
+				sortConj(); //Sort Out Conjunctions
+				populateEvInsts(); //Populate Eventuality-Instances
+				removeDuplicateEvInst(); //Remove Duplicate Eventuality-Instances
+				printDebugInfo(params);
+				System.out.println("Resulting Triples:");
+				return TripleGen();				
+			}
+			else{
+				System.out.println("Input is not in ERG Format. -_- \n");
+				break; //Breaks out of loop right away at error point
+			}
+		}
+		return null;
+	}
+	
+	public static void printDebugInfo(String params){
+		if (params.toLowerCase().contains("-pev")){
+			System.out.println("\nEventualities:");
+			printArrList(getEvs()); //Prints Evs
+		}
+		if (params.toLowerCase().contains("-pal")){
+			System.out.println("\nArgList");
+			printArrList(getArglist());
+		}
+		if (params.toLowerCase().contains("-pfi")){
+			System.out.println("\nFree Instances:");
+			printArrList(getInsts());
+		}
+		if (params.toLowerCase().contains("-pei")){
+			System.out.println("\nEventuality Instances");
+			printArrList(Sorter.getEvinsts()); //Prints Conjs
+		}
+		if (params.toLowerCase().contains("-piv")){
+			System.out.println("\nIVars:");
+			printArrList(Sorter.getIvars()); //Prints Conjs
+		}
+		if (params.toLowerCase().contains("-pcj")){
+			System.out.println("\nConjunctions:");
+			printArrList(Sorter.getConjs()); //Prints Conjs
+		}
+	}
+	public static boolean InputFormatOK(String parse){
+		if (parse.substring(0,1).equals("{") && parse.substring(parse.length()-1, parse.length()).equals("}")){
+			return true;
+		}
+		return false;
+	}
 	public static String getInput(){
 		return input;
 	}
@@ -41,14 +108,6 @@ public class Sorter {
 	public static void input(String s){
 		input = s;
 	}
-	
-	/*public static void convert(String sentence, String ergout){
-		clearPast();
-		input(sentence;
-		buildIndex(ergout);
-		computeTriple();
-		sortConj();
-	}*/
 	
 	public static void sortConj(){
 		for (String i:insts){
@@ -114,7 +173,9 @@ public class Sorter {
 						evinsts.add(s.substring(startsp + 1, stopsp));
 					}
 					else if (s.contains("e")){
+						if(debugon){
 						System.out.println("EFLAG");
+						}
 					}
 					s = s.substring(stopsp + 2, s.length()); //Removes space after comma
 				}
@@ -131,14 +192,14 @@ public class Sorter {
 			}
 		}
 	}
-	
+
 	public static void removeDuplicateEvInst(){
 		HashSet<String> hs = new HashSet<String>();
 		hs.addAll(evinsts);
 		evinsts.clear();
 		evinsts.addAll(hs);	
 	}
-	
+	//Triple Generation
 	public static ArrayList<String> TripleGen(){
 		ArrayList<String> results = new ArrayList<String>();
 		for(String s: evs){
@@ -150,14 +211,19 @@ public class Sorter {
 			c = ArgID(s, 1);
 			//Check if any slots are still unfilled, if so, fill again using traditional method (Method 1)
 			if (a == null){
-				System.out.println("A is null, filling.");
 				a = fillArgs(s, -1);
-				System.out.println("After Fill a: " + a);
+				if (debugon){
+					System.out.println("A is null, filling.");
+					System.out.println("After Fill a: " + a);
+				}
 			}
 			if (c == null){
-				System.out.println("C is null, filling.");
 				c = fillArgs(s, 1);
-				System.out.println("After Fill c: " + c);
+				if (debugon){
+					System.out.println("C is null, filling.");
+					System.out.println("After Fill c: " + c);
+				}
+				
 			}
 			
 			//Converts Case for Readability
@@ -170,17 +236,20 @@ public class Sorter {
 			if (c != null){
 				c = c.toLowerCase();
 			}
-			System.out.println (a + " " + b + " " + c);
-			System.out.println((a == null) + " " + (b == null) + " " + (c == null) + "|" + a.equals(c));
+			if (debugon){
+				System.out.println (a + " " + b + " " + c);
+				System.out.println((a == null) + " " + (b == null) + " " + (c == null) + "|" + a.equals(c));
+			}
 			//Adds the result to a list, if it is indeed a valid triple
 			if (a != null && b != null && c != null && !(a.equals(c))){//If a triple is present
 				results.add(a + " " + b + " " + c);
-				//System.out.println("TRIPLE: " + a + "(a) " + b + "(b) " + c + "(c)");//Spit out the triple DEBUG
+				if (debugon){
+				System.out.println("TRIPLE: " + a + "(a) " + b + "(b) " + c + "(c)");//Spit out the triple DEBUG
+				}
 			}
 		}
 		return results;
 	}
-	
 	public static String fillArgs(String s, int compare){
 		ArrayList<String> targs = new ArrayList<String>();
 		targs.clear();
@@ -255,7 +324,6 @@ public class Sorter {
 		}
 		return compareArgs(compare, 2);
 	}
-	
 	public static String compareArgs(int compare, int methodselect){
 		if (methodselect == 1){//Simply Prioritizes using highest vs lowest
 			Collections.sort(arglist); // Sorts the Argument List
@@ -295,47 +363,16 @@ public class Sorter {
 		return null; //Otherwise, return nothing
 	}
 	
-	public static String oldArgID(String s, int compare){
-		//For this particular eventuality, parse for the args to the comma.
-		arglist.clear();
-		while (s.contains(":")){ //While there are still colons left
-			int startsp = s.indexOf("ARG"); //Look for first space
-			int stopsp = startsp; //Default to nothing
-			if (s.contains(":")){ //Look for stop character
-				stopsp = s.indexOf(":", startsp + 1); 
-				if (s.substring(startsp + 1, startsp+2).contains("e")){
-					//REFER E to Processing
-				}
-				arglist.add(s.substring(startsp, stopsp));
-				s = s.substring(stopsp + 1, s.length()); //Removes space after comma
-			}
-		}
-		
-		Collections.sort(arglist);
-		if(compare == -1){//Specify return lowest numbered ARG
-			return arglist.get(0);
-		}
-		if(compare == 1){//Specify return highest numbered ARG
-			return arglist.get(arglist.size()-1);
-		}
-		return null;//Otherwise, return nothing
-	}
-	
-	//Pre-processes Input, either as string of ArrayList
+	//Pre-processes Input, either as string or ArrayList
 	public static String touchInput(String s){//Removes Curly Brackets from Input
 		//System.out.println("Touched Input: " + s.substring(1, s.length()-1));
 		return s.substring(1, s.length()-1);
 	}
-	public static void touchVars(ArrayList<String> alvar){//Touches if not touched originally from input
-		alvar.set(alvar.size()-1, alvar.get(alvar.size()-1).substring(0, alvar.get(alvar.size()-1).length()-2));
-		alvar.set(0, alvar.get(0).substring(1, alvar.get(0).length()));
-	}
-	
 	public static String keyOut(String s){ //Detects Key Eventuality
 		int end = 0;
 		for (int i = 0; i < s.length(); i++){
 			if (s.substring(i, i+1).equals(" ")){//s.substring(i, i+2).equals(" ")){ // a space is found
-				System.out.println("Keyed: <" + s.substring(0, i) + ">"); //Debug Purposes Only
+				//System.out.println("Keyed: <" + s.substring(0, i) + ">"); //Debug Purposes Only
 				keyEv = s.substring(0, i); //Identifies and sets the Key Variable
 				end = i; //makes sure already parsed stuff is not reparsed
 				break;
@@ -360,99 +397,8 @@ public class Sorter {
 		
 		return result;
 	}
-	
-	//Compute Triples
-	
-	public static void explicate(){//Verbose output for debugging
-		
-	}
-	
-	public static void computeTriple(){
-		/*String s = evs.get(index);
-		//Find the numbering of arggs
-		while (s.contains("ARG")){
-			int number = s.substring("ARG") + 3;
-		}*/
-	}
-	
-	/*public static int containsEv(String s){
-		if (s.contains("ARG")){
-			int typeindicator = s.indexOf("ARG");
-		}
-		return 0;//TMP
-	}*/
-
-	public static void computeOldTriple(){
-		//NOT SURE IF THIS REACHES CORRECTLY
-		int kloc = -1; //Find eventuality that matches the key
-		for (int i = 0; i < evs.size(); i++){
-			  if (evs.get(i).contains(keyEv)){
-			    kloc = i;
-			  }
-		}
-		
-		//Locate square bracket location for the key eventuality
-		int bstart = evs.get(kloc).indexOf("[");
-		int bend = evs.get(kloc).indexOf("]");
-		String relation = evs.get(kloc).substring(bstart + 1, bend); // Not Inclusive of Bracket
-		System.out.println("Relation: " + relation); //For Debug
-
-		//For each argument detected, get the range in string
-		
-		//FIND ARGUMENT 1
-		String arg1 = "[ARG1 Placeholder]";		
-		int col1 = relation.indexOf(":"); //Finds first colon as marker for first argument;
-		int x1 = relation.indexOf("x");
-		String inst1 = relation.substring(x1, col1 +1); //code for first instance
-		System.out.println("Searching for " + inst1);
-		//Search Instances array for inst1;
-		
-		//NOT SURE IF THIS GETS CORRECTLY
-		int xloc1 = -1; //Find instance that matches the key
-		for (int i = 0; i < insts.size(); i++){
-			  if (insts.get(i).contains(inst1)){
-			    xloc1 = i;
-			  }
-		}
-		
-		arg1 = getInstString(xloc1, insts).toLowerCase();
-		System.out.println("ARG 1: " + arg1);
-		
-		//FIND ARGUMENT 2
-		String arg2 = "[ARG2 Placeholder]";		
-		int col2 = relation.indexOf(":", col1 + 1); //Finds first colon as marker for first argument;
-		int x2 = relation.indexOf("x", x1 + 1);
-		String inst2 = relation.substring(x2, col2 +1); //code for first instance
-		System.out.println("Searching for " + inst2);
-		//Search Instances array for inst2;
-		
-		//NOT SURE IF THIS GETS CORRECTLY
-		int xloc2 = -1; //Find instance that matches the key
-		for (int i = 0; i < insts.size(); i++){
-			  if (insts.get(i).contains(inst2)){
-			    xloc2 = i;
-			  }
-		}
-		arg2 = getInstString(xloc2, insts).toLowerCase();
-		System.out.println("ARG 2: " + arg2);
-		
-		
-		//Get the Key
-		//For first argument, get relation, set it as the key, erasing middle
-		String argk = "[BLANKKEY]";
-		int icomma = relation.indexOf(",");
-		argk = relation.substring(col1 + 1, icomma); //From Colon to Comma (Exclusive)
-		//Treat the Argk
-		argk = argk.toUpperCase();
-		//QUESTION: Do we need to treat the n value? What are the related inputs referenced w/ SV?
-		
-		//Get elements existing at appropriate line number ranges
-		
-		String postparse = arg1 + " " + argk + " " + arg2; //Prints the Isolated Triple
-		System.out.println(postparse);
-	}
-	
-	public static void printArrList(ArrayList<String> al){//Convenient ArrayList Printing for DEBUGGING
+	//Helpful print function for ArrayList Debugging
+	public static void printArrList(ArrayList<String> al){ //Convenient ArrayList Printing for DEBUGGING
 		System.out.println("<Start of ArrayList>");
 		for (String s: al){
 			System.out.println(s);
