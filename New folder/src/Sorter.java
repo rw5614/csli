@@ -2,7 +2,6 @@ import java.util.*;
 public class Sorter {
 	private static String input = "";
 	private static String keyEv = ""; //Key Eventuality
-	private static String evstring = "";
 	private static int sentencecounter = 0;
 	private static boolean debugon = false;
 	private static ArrayList<String> evs = new ArrayList<String>();
@@ -118,7 +117,6 @@ public class Sorter {
 	public static void clear(){
 		keyEv = "";
 		input = "";
-		evstring = "";
 		evs.clear();
 		insts.clear();
 		evinsts.clear();
@@ -144,7 +142,7 @@ public class Sorter {
 						String addthis = s.substring(0, i+1);
 						addthis = addthis.replaceAll("CARG ", "ARGC xcc");
 						evs.add(addthis);
-						evstring = evstring + (addthis);
+
 					}
 					else if (s.substring(0,1).equals("i")){ //Places I-Variables in ivars Array
 						ivars.add(s.substring(0, i+1));
@@ -198,7 +196,7 @@ public class Sorter {
 		evinsts.addAll(hs);	
 	}
 	//Triple Generation
-	public static ArrayList<String> TripleGen(int mode){ //Mode one removes single-argument triples, mode 2 includes it with placeholder no_arg for empty arguments
+	public static ArrayList<String> TripleGen(int mode, int wrapperoption){ //Mode one removes single-argument triples, mode 2 includes it with placeholder no_arg for empty arguments
 		ArrayList<String> results = new ArrayList<String>();
 		for(String s: evs){
 			String a = null;
